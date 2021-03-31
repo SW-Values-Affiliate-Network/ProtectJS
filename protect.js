@@ -67,7 +67,7 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
 
     this.__ProtectCheck__ = (property) => {
 
-      this.__ProtectAccess__ = this.__ParameterCheck__(property, __Method__, 'function')
+      this.__ProtectAccess__ = this.__ParameterCheck__(property, this[property], 'function')
 
       if (property.indexOf(this._$ProtectedID__) === 0 || property.indexOf('__') === 0)
         return true
