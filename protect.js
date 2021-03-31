@@ -6,7 +6,9 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
 
     this._$Version__ = this._$Version__ || 1
 
-    this._$ClassID__ = this._$ClassID__ || btoa(`${this._$Version__}:${document.title}:${BaseClass.name}`)
+    this._$ClassID__ = this._$ClassID__ || btoa(`${new Date().toString()} | ${this._$Version__} | ${document.title} | ${BaseClass.name}`)
+
+    console.log(this._$ClassID__)
 
     this._$ProtectedID__ = this._$ProtectedID__ || '_$'
 
@@ -65,7 +67,7 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
 
     this.__ProtectCheck__ = (property) => {
 
-      this.__ProtectAccess__ = this.__ParameterCheck__(property, this[property], 'function')
+      this.__ProtectAccess__ = this.__ParameterCheck__(property, __Method__, 'function')
 
       if (property.indexOf(this._$ProtectedID__) === 0 || property.indexOf('__') === 0)
         return true
@@ -115,11 +117,11 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
               if (args.length === 0)
                 this.__ReferenceError__(property, 'You must provide an object of named arguments in')
 
-              this.__FunctionString__ = String(this[property])
+              const __FunctionString__ = String(__Method__)
 
-              if (this.__FunctionString__.match(/\{\n+\s+if \(\_\$\) return/gm)) {
+              if (__FunctionString__.match(/\{\n+\s+if \(\_\$\) return/gm)) {
 
-                const argTypes = this[property]({ _$: true })
+                const argTypes = __Method__({ _$: true })
 
                 Object.keys(args[0]).map(arg => {
                   this.__ParameterCheck__(arg, args[0][arg], argTypes.types[arg])
@@ -131,7 +133,7 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
               return __Result__
             }
           }
-          
+
           this.__ReferenceError__(property)
         }
 
@@ -142,7 +144,7 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
 
         if (this.__ProtectCheck__(property)) this.__ReferenceError__(property)
 
-        return Reflect(this[property] = value)
+        return Reflect(this.[property] = value)
       }
     }
 
