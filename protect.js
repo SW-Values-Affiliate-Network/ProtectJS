@@ -111,15 +111,13 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
 
       set: (target, property, value) => {
 
-        if (this.__PrivateCheck__(property))
-          return Reflect(this[property] = value)
+        if (this.__PrivateCheck__(property)) return Reflect(this[property] = value)
 
         this.__ReferenceError__(property)
       }
     }
 
-    if ( this.Debug )
-    console.info('__Private__',this.__Private__)
+    if (this.Debug) console.info('__Private__', this.__Private__)
 
     return new Proxy(this, this.__Handler__)
   }
