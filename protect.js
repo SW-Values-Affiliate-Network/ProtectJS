@@ -13,17 +13,22 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
     if (this._$Log__) {
 
       this._$Log__ = {
-        name: this._$ClassID__,
+        Name: this._$ClassID__,
+        Error: ((error, event) => {
+          throw new Error(`${error} ${event}`)
+        })()
       }
 
-      this._$Log__.open = window.indexedDB.open(
-        this._$Log__.name,
-        this._$Version__,
-      )
+      this._$Log__.open = window
+        .indexedDB
+        .open(
+          this._$Log__.name,
+          this._$Version__,
+        )
 
       this._$Log__.open.onerror = event => {
 
-        throw new Error('Failed to connect to indexedDB store.')
+        this._$Log__.Error('Failed to open indexedDB', event)
       }
 
       this._$Log__.open.onsuccess = event => {
@@ -34,7 +39,7 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
 
 
 
-    this.__ReferenceError__ = (property, message = `Private properties may not be accessed or set:`) => {
+    this.__ReferenceError__ = (property, message = 'Private properties may not be accessed or set:') => {
 
       throw new ReferenceError(`${message} ${property}`)
     }
@@ -108,7 +113,7 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
             return (...args) => {
 
               if (args.length === 0)
-                this.__ReferenceError__(property, `You must provide an object of named arguments in`)
+                this.__ReferenceError__(property, 'You must provide an object of named arguments in')
 
               const FunctionString = String(this[property])
 
