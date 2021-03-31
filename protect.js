@@ -63,9 +63,9 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
       return false
     }
 
-    this.__PrivateCheck__ = (property) => {
+    this.__ProtectCheck__ = (property) => {
 
-      this.__PrivateAccess__ = this.__ParameterCheck__(property, this[property], 'function')
+      this.__ProtectAccess__ = this.__ParameterCheck__(property, this[property], 'function')
 
       if (property.indexOf(this._$ProtectedID__) === 0 || property.indexOf('__') === 0)
         return true
@@ -73,7 +73,7 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
       return false
     }
 
-    this.__Private__ = {
+    this.__Protect__ = {
 
       Properties:
         Object
@@ -81,7 +81,7 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
           .filter(
             property => {
 
-              if (this.__PrivateCheck__(property)) return property
+              if (this.__ProtectCheck__(property)) return property
 
               return
             }
@@ -93,7 +93,7 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
           .filter(
             property => {
 
-              if (this.__PrivateCheck__(property)) return property
+              if (this.__ProtectCheck__(property)) return property
 
               return
             }
@@ -104,9 +104,9 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
 
       get: (target, property) => {
 
-        if (this.__PrivateCheck__(property)) {
+        if (this.__ProtectCheck__(property)) {
 
-          if (this.__ParameterCheck__(property, this[property], 'function')) {
+          if (this.__Protect__.Methods.includes(property)) {
 
             const __Method__ = target[property]
 
@@ -115,9 +115,7 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
               if (args.length === 0)
                 this.__ReferenceError__(property, 'You must provide an object of named arguments in')
 
-              const FunctionString = String(this[property])
-
-              if (FunctionString.indexOf(this._$ProtectedID__)) {
+              if (true) {
 
                 const argTypes = this[property]({ _$: true })
 
@@ -140,13 +138,13 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
 
       set: (target, property, value) => {
 
-        if (this.__PrivateCheck__(property)) return Reflect(this[property] = value)
+        if (this.__ProtectCheck__(property)) return Reflect(this[property] = value)
 
         this.__ReferenceError__(property)
       }
     }
 
-    if (this._$Debug__) console.info('__Private__', this.__Private__)
+    if (this._$Debug__) console.info('__Protect__', this.__Protect__)
 
     return new Proxy(this, this._$Handler__)
   }
