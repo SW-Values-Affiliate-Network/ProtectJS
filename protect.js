@@ -144,7 +144,7 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
 
         if (this.__ProtectCheck__(property)) this.__ReferenceError__(property)
 
-        return Reflect(this.[property] = value)
+        return Reflect(this[property] = value)
       }
     }
 
