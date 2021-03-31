@@ -115,7 +115,9 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
               if (args.length === 0)
                 this.__ReferenceError__(property, 'You must provide an object of named arguments in')
 
-              if (true) {
+              this.__FunctionString__ = String(this[property])
+
+              if (this.__FunctionString__.match(/\{\n+\s+if \(\_\$\) return/gm)) 
 
                 const argTypes = this[property]({ _$: true })
 
