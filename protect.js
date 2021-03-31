@@ -4,6 +4,36 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
 
     super()
 
+    this._$Version__ = this._$Version__ || 1
+
+    this._$ClassID__ = this._$ClassID__ || btoa(`${this._$Version__}:${document.title}:${BaseClass.name}`)
+
+    this._$ProtectedID__ = this._$ProtectedID__ || '_$'
+
+    if (this._$Log__) {
+
+      this._$Log__ = {
+        name: this._$ClassID__,
+      }
+
+      this._$Log__.open = window.indexedDB.open(
+        this._$Log__.name,
+        this._$Version__,
+      )
+
+      this._$Log__.open.onerror = event => {
+
+        throw new Error('Failed to connect to indexedDB store.')
+      }
+
+      this._$Log__.open.onsuccess = event => {
+
+        this._$Log__.db = event.target.result
+      }
+    }
+
+
+
     this.__ReferenceError__ = (property, message = `Private properties may not be accessed or set:`) => {
 
       throw new ReferenceError(`${message} ${property}`)
@@ -16,71 +46,62 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
 
     this.__ParameterCheck__ = (name, parameter, type) => {
 
-      if (!parameter) return false
+      if (typeof parameter === 'undefined' || parameter.length === 0) return false
 
       if (
         typeof parameter === String(type) ||
         typeof type === 'object' &&
         parameter instanceof type
       )
-        return parameter
+        return true
 
-      this.__TypeError__(name, type)
-    }
-
-    this.__Private__ = {
-
-      Properties: Object
-        .getOwnPropertyNames(this)
-        .filter(
-          property => {
-
-            if (property.indexOf('_') === 0) return property
-
-            return
-          }
-        ),
-
-      Methods: Object
-        .getOwnPropertyNames(BaseClass.prototype)
-        .filter(
-          property => {
-
-            if (property.indexOf('_') === 0) return property
-
-            return
-          }
-        ),
+      return false
     }
 
     this.__PrivateCheck__ = (property) => {
 
-      if (
-        property.indexOf('_') === 0 ||
-        property in this.__Private__ &&
-        !this.__PrivateAccess__
-      ) {
+      this.__PrivateAccess__ = this.__ParameterCheck__(property, this[property], 'function')
 
-        this.__ReferenceError__(property)
-      }
+      if (property.indexOf(this._$ProtectedID__) === 0 || property.indexOf('__') === 0)
+        return true
 
-      try {
-
-        if (typeof this[property] === 'function') { this.__PrivateAccess__ = true }
-      } catch (error) {
-
-        this.__ReferenceError__(property)
-      }
-
-      return true
+      return false
     }
 
-    this.__Handler__ = {
+    this.__Private__ = {
+
+      Properties:
+        Object
+          .getOwnPropertyNames(this)
+          .filter(
+            property => {
+
+              if (this.__PrivateCheck__(property)) return property
+
+              return
+            }
+          ),
+
+      Methods:
+        Object
+          .getOwnPropertyNames(BaseClass.prototype)
+          .filter(
+            property => {
+
+              if (this.__PrivateCheck__(property)) return property
+
+              return
+            }
+          ),
+    }
+
+    this._$Handler__ = this._$Handler__ || {
 
       get: (target, property) => {
+
         if (this.__PrivateCheck__(property)) {
 
-          if (typeof this[property] === 'function') {
+          if (this.__ParameterCheck__(property, this[property], 'function')) {
 
             const __Method__ = target[property]
 
@@ -91,7 +112,7 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
 
               const FunctionString = String(this[property])
 
-              if (FunctionString.match(/\{\n+\s+if \(\_\$\) return/gm)) {
+              if (FunctionString.indexOf(this._$ProtectedID__)) {
 
                 const argTypes = this[property]({ _$: true })
 
@@ -120,8 +141,8 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
       }
     }
 
-    if (this.Debug) console.info('__Private__', this.__Private__)
+    if (this._$Debug__) console.info('__Private__', this.__Private__)
 
-    return new Proxy(this, this.__Handler__)
+    return new Proxy(this, this._$Handler__)
   }
 }
