@@ -117,7 +117,7 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
 
               this.__FunctionString__ = String(this[property])
 
-              if (this.__FunctionString__.match(/\{\n+\s+if \(\_\$\) return/gm)) 
+              if (this.__FunctionString__.match(/\{\n+\s+if \(\_\$\) return/gm)) {
 
                 const argTypes = this[property]({ _$: true })
 
@@ -131,11 +131,11 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
               return __Result__
             }
           }
-
-          return this[property]
+          
+          this.__ReferenceError__(property)
         }
 
-        this.__ReferenceError__(property)
+        return this[property]
       },
 
       set: (target, property, value) => {
