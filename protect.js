@@ -89,9 +89,12 @@ export const Protect = BaseClass => class ProtectClass extends BaseClass {
               if (args.length === 0)
                 this.__ReferenceError__(property, `You must provide an object of named arguments in`)
 
-              const argTypes = this[property]({ _$: true })
+              const FunctionString = String(this[property])
 
-              if (argTypes.types) {
+              if (FunctionString.match(/\{\n+\s+if \(\_\$\) return/gm)) {
+
+                const argTypes = this[property]({ _$: true })
+
                 Object.keys(args[0]).map(arg => {
                   this.__ParameterCheck__(arg, args[0][arg], argTypes.types[arg])
                 })
