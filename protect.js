@@ -1,155 +1,219 @@
-export const Protect = BaseClass => class ProtectClass extends BaseClass {
+export const Protect = (BaseClass, ClassType) => {
+  switch (String(ClassType).toLowerCase()) {
+    case 'private':
+      return class PrivateClass extends BaseClass {
+        constructor() {
+          super()
 
-  constructor() {
+          this.__Version__ = 1
 
-    super()
+          this.__ClassID__ = btoa(`${
+            new Date()
+              .toString()
+            }${
+            this.__Version__
+            }${
+            document.title}${this.name
+            }`
+            .replace(/[^A-Z0-9]/ig, "_")
+          )
 
-    this._$Version__ = this._$Version__ || 1
+          this.__ProtectedID__ = '_$'
 
-    this._$ClassID__ = this._$ClassID__ || btoa(`${new Date().toString()} | ${this._$Version__} | ${document.title} | ${BaseClass.name}`)
+          this.__AccessEvent__ = new EventTarget
 
-    console.log(this._$ClassID__)
+          this.__AccessEvent__.addEventListener('AccessFalse', event => {
 
-    this._$ProtectedID__ = this._$ProtectedID__ || '_$'
+            this.__ProtectedAccess__ = false
+          })
 
-    if (this._$Log__) {
+          this.__AccessEvent__.addEventListener('AccessTrue', event => {
 
-      this._$Log__ = {
-        Name: this._$ClassID__,
-        Error: ((error, event) => {
-          throw new Error(`${error} ${event}`)
-        })()
-      }
+            this.__ProtectedAccess__ = true
+          })
 
-      this._$Log__.open = window
-        .indexedDB
-        .open(
-          this._$Log__.name,
-          this._$Version__,
-        )
+          this.__AccessEvent__.False = new Event('AccessFalse')
 
-      this._$Log__.open.onerror = event => {
+          this.__AccessEvent__.True = new Event('AccessTrue')
 
-        this._$Log__.Error('Failed to open indexedDB', event)
-      }
-
-      this._$Log__.open.onsuccess = event => {
-
-        this._$Log__.db = event.target.result
-      }
-    }
-
+          this.__ProtectedAccess__ = false
 
 
-    this.__ReferenceError__ = (property, message = 'Private properties may not be accessed or set:') => {
+          this[this.__ProtectedID__] = results => {
 
-      throw new ReferenceError(`${message} ${property}`)
-    }
+            const __Remit__ = results
+            this.__AccessEvent__.dispatchEvent(this.__AccessEvent__.False)
+            return __Remit__
+          }
 
-    this.__TypeError__ = (property, type) => {
+          if (this.__Log__) {
 
-      throw new TypeError(`${typeof property === 'string' ? property : property.name} must be of type: ${typeof type === 'string' ? type : typeof type}`)
-    }
-
-    this.__ParameterCheck__ = (name, parameter, type) => {
-
-      if (typeof parameter === 'undefined' || parameter.length === 0) return false
-
-      if (
-        typeof parameter === String(type) ||
-        typeof type === 'object' &&
-        parameter instanceof type
-      )
-        return true
-
-      return false
-    }
-
-    this.__ProtectCheck__ = (property) => {
-
-      this.__ProtectAccess__ = this.__ParameterCheck__(property, this[property], 'function')
-
-      if (property.indexOf(this._$ProtectedID__) === 0 || property.indexOf('__') === 0)
-        return true
-
-      return false
-    }
-
-    this.__Protect__ = {
-
-      Properties:
-        Object
-          .getOwnPropertyNames(this)
-          .filter(
-            property => {
-
-              if (this.__ProtectCheck__(property)) return property
-
-              return
-            }
-          ),
-
-      Methods:
-        Object
-          .getOwnPropertyNames(BaseClass.prototype)
-          .filter(
-            property => {
-
-              if (this.__ProtectCheck__(property)) return property
-
-              return
-            }
-          ),
-    }
-
-    this._$Handler__ = this._$Handler__ || {
-
-      get: (target, property) => {
-
-        if (this.__ProtectCheck__(property)) {
-
-          if (this.__Protect__.Methods.includes(property)) {
-
-            const __Method__ = target[property]
-
-            return (...args) => {
-
-              if (args.length === 0)
-                this.__ReferenceError__(property, 'You must provide an object of named arguments in')
-
-              const __FunctionString__ = String(__Method__)
-
-              if (__FunctionString__.match(/\{\n+\s+if \(\_\$\) return/gm)) {
-
-                const argTypes = __Method__({ _$: true })
-
-                Object.keys(args[0]).map(arg => {
-                  this.__ParameterCheck__(arg, args[0][arg], argTypes.types[arg])
-                })
+            this.__Log__ = {
+              Name: this.__ClassID__,
+              Error: (error, event) => {
+                throw new Error(`${error} ${event}`)
               }
+            }
 
-              let __Result__ = __Method__.apply(this, args)
+            this.__Log__.open = window
+              .indexedDB
+              .open(
+                this.__Log__.name,
+                this.__Version__,
+              )
 
-              return __Result__
+            this.__Log__.open.onerror = event => {
+
+              this.__Log__.Error('Failed to open indexedDB', event)
+            }
+
+            this.__Log__.open.onsuccess = event => {
+
+              this.__Log__.db = event.target.result
             }
           }
 
-          this.__ReferenceError__(property)
+          this.__ReferenceError__ = (
+            property,
+            message = 'Protect properties may not be accessed or set from outside of its original context:'
+          ) => {
+
+            throw new ReferenceError(`${message} ${property}`)
+          }
+
+          this.__TypeError__ = (property, type) => {
+
+            throw new TypeError(`${
+              typeof property === 'string' ?
+                property :
+                property.name
+              } must be of type: ${
+              typeof type === 'string' ?
+                type :
+                typeof type
+              }`)
+          }
+
+          this.__ParameterCheck__ = (name, parameter, type) => {
+
+            if (
+              typeof parameter === 'undefined' ||
+              parameter.length === 0
+            ) return false
+
+            if (
+              typeof parameter === String(type) ||
+              typeof type === 'object' &&
+              parameter instanceof type
+            )
+              return true
+
+            return false
+          }
+
+          this.__ProtectCheck__ = (property) => {
+
+            if (
+              property.indexOf(this.__ProtectedID__) === 0 ||
+              property.indexOf('__') === 0
+            ) return true
+
+            return false
+          }
+
+          this.__Protected__ = {
+            Methods: [],
+            Properties: []
+          }
+
+          Object
+            .getOwnPropertyNames(this)
+            .filter(
+              property => {
+
+                if (this.__ProtectCheck__(property)) {
+
+                  if (this.__ParameterCheck__(property, this[property], 'function'))
+                    this.__Protected__.Methods.push(property)
+
+                  this.__Protected__.Properties.push(property)
+                }
+
+                return
+              }
+            ),
+
+            this.__Handler__ = {
+              apply: (target, thisArg, argumentsList) => {
+                consoel.log('hey')
+              },
+
+              get: (target, property) => {
+
+                if (
+                  this.__Protected__.Properties.includes(property) &&
+                  !this.__ProtectedAccess__
+                )
+                  this.__ReferenceError__(property)
+
+                if (
+                  this.__Protected__.Methods.includes(property) &&
+                  !this.__ProtectedAccess__
+                )
+                  this.__ReferenceError__(property)
+
+                if (
+                  this.__ParameterCheck__(
+                    property,
+                    this[property],
+                    'function'
+                  )
+                ) {
+
+                  this.__ProtectedAccess__ = true
+
+                  const __Method__ = this[property]
+
+                  const __ArgTypes__ = __Method__({ _$: true })
+
+                  return (...args) => {
+
+                    if (args.length === 0)
+                      this.__ReferenceError__(
+                        property,
+                        'You must provide an object of named arguments in'
+                      )
+
+                    Object.keys(args[0]).map(arg => {
+
+                      if (!this.__ParameterCheck__(arg, args[0][arg], __ArgTypes__.types[arg]))
+                        this.__TypeError__(arg, __ArgTypes__.types[arg])
+                    })
+
+                    return __Method__.apply(this, [...args, this.__ProtectedID__])
+                  }
+                }
+
+
+                return this[property]
+              },
+
+              set: (target, property, value) => {
+
+                if (this.__ProtectCheck__(property)) this.__ReferenceError__(property)
+
+                return this[property] = value
+              }
+            }
+
+          if (this.__Debug__) console.info('__Protected__', this.__Protected__)
+
+          return new Proxy(this, this.__Handler__)
         }
-
-        return this[property]
-      },
-
-      set: (target, property, value) => {
-
-        if (this.__ProtectCheck__(property)) this.__ReferenceError__(property)
-
-        return Reflect(this[property] = value)
       }
-    }
-
-    if (this._$Debug__) console.info('__Protect__', this.__Protect__)
-
-    return new Proxy(this, this._$Handler__)
+    case 'protected':
+    return
+    default:
+    return
   }
 }
