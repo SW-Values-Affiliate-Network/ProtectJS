@@ -1,12 +1,11 @@
-// Import in ProtectJS
-import { Protect } from './protect.js'
+// Link ProtectJS directly in the head of your html using the attribute async.
 /* 
 - ProtectJS is a dynamic type checking and enforcement class decorator.
 - A protected class can only be instanciated using the new reserved word.
 - The first parameter must be a boolean value determining if the protected class can be extended.
 - Protected methods and properties can be declared using double underscores ( __ ) at the beginning of their name.
 */
-const Class = Protect( true, class Class {
+const Class = __Protect__( true, class Class {
     constructor() {
 
       // Debugging: You can enable debuging which will print out the class's protected properties and methods in the console.

@@ -17,11 +17,15 @@ body {
   display: grid;
   grid-template-rows: auto 1fr auto;
   word-wrap: break-word;
+  background-color: #e3e3e3;
+  color: #444444;
 }
 header,
 footer,
 main { 
-  max-width: 1200px
+  max-width: 1200px;
+  font-size: 1.6rem;
+  padding: 0 15px;
 }
 header {
   display: flex;
@@ -40,6 +44,37 @@ h6 {
 small {
   font-size: 75%;
 }
-pre {
-  font-size: 1.6rem;
+#top-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#top-content > i {
+  font-style: normal;
+  font-size: 3.2rem;
+  padding: 15px;
+}
+#top-content h1 {
+  flex-grow: 1;
+  padding:15px;
+}
+#top-content section div {
+  padding: 15px;
+}
+ul {
+  min-width: 320px;
+}
+ul li {
+  list-style: none;
+  margin: 10px 0;
+}
+ul li:before {
+  content:'🛡';
+  margin-right: 5px;
+}
+@media (max-width:1078px){
+  #top-content {
+    flex-direction: column;
+    align-items: start;
+  }
 }

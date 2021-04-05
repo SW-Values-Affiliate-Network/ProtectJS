@@ -1,4 +1,4 @@
-export const Protect = (__Extend__ = false, BaseClass) => {
+window.__Protect__ = (__Extend__ = false, BaseClass) => {
   if (BaseClass.prototype.constructor)
     return class ProtectedClass extends BaseClass {
       constructor() {
@@ -55,54 +55,6 @@ export const Protect = (__Extend__ = false, BaseClass) => {
           )
         const __Debug__ = this.__Debug__ === true
         const __IDBName__ = `Protect-${__DocumentTitle__}`
-        /* 
-          May add logging ability in the future.
-        */
-        // const __LogCheck__ = this.__Log__ === true
-
-        // if (__LogCheck__) {
-
-        //   let __Log__ = {
-        //     idb: __IDBName__,
-        //     Error: (error, event) => {
-        //       throw new Error(`${error} ${event}`)
-        //     }
-        //   }
-
-        //   __Log__.open = indexedDB
-        //     .open(
-        //       __Log__.idb,
-        //       __Version__,
-        //     )
-
-
-        //   __Log__.open.onupgradeneeded = event => {
-
-        //     __Log__.db = target.result
-        //     __Log__.store = __Log__
-        //       .db
-        //       .createObjectStore(
-        //         `Log-Store-${__ClassID__}`,
-        //         { keyPath: 'logid' }
-        //       )
-        //   }
-
-        //   __Log__.open.onerror = event => {
-
-        //     __Log__.Error(
-        //       __ErrorMessages__
-        //         .log
-        //         .openError,
-        //       event
-        //     )
-        //   }
-
-        //   __Log__.open.onsuccess = ({ target }) => {
-
-        //     __Log__.db = target.result
-        //   }
-        // }
-
         const __ReferenceError__ = (
           __Property__,
           message = __ErrorMessages__
@@ -112,7 +64,6 @@ export const Protect = (__Extend__ = false, BaseClass) => {
 
           throw new ReferenceError(`${message}: ${__Property__}`)
         }
-
         const __TypeError__ = (
           __Property__,
           type,
@@ -131,7 +82,6 @@ export const Protect = (__Extend__ = false, BaseClass) => {
               typeof type
             }`)
         }
-
         const __ParameterCheck__ = (name, parameter, type) => {
 
           if (!__Types__.includes(type))
@@ -162,7 +112,6 @@ export const Protect = (__Extend__ = false, BaseClass) => {
 
           return false
         }
-
         const __ProtectCheck__ = (__Property__) => {
 
           if (__Property__.indexOf('__') === 0)
@@ -170,7 +119,6 @@ export const Protect = (__Extend__ = false, BaseClass) => {
 
           return false
         }
-
         const __Protect__ = {
           Methods: [],
           Properties: []
@@ -197,10 +145,7 @@ export const Protect = (__Extend__ = false, BaseClass) => {
               return
             }
           )
-
-
         const __Protected__ = Object.freeze(__Protect__)
-
         const __Handler__ = this.__Handler__ || {
 
           get: (__Target__, __Property__) => {
