@@ -1,42 +1,29 @@
-// Protect - a function that takes a class as an argument and returns an immutable private class.
-export const Protect = (BaseClass) => {
-
-  // Check is argmuent is a class.
+export const Protect = (__Extend__ = false, BaseClass) => {
   if (BaseClass.prototype.constructor)
-
-    // ProtectedClass - a new class using the argmuent class as a mixin.
     return class ProtectedClass extends BaseClass {
-
-      // All functions and properties are declared in the constructor.
       constructor() {
-
-        // Bring in all the methods and properties of the mixin class
         super()
 
-        // __ProtectedAccess__ - protected method and property access.
         let __ProtectedAccess__ = false
+
         const __ErrorMessages__ = {
           type: {
-            default: 'must return type',
-            parameter: 'type does not exist or is not specified in the class interface',
-            interface: 'types can not be determined. There must be an interface object declared in the class constuctor',
+            __default: 'must be type',
+            parameter: 'is not a specified named argument or is not specified in the class interface',
+            interface: 'types can not be determined. There must be an interface object with your methods declared in the class constuctor',
             effects: 'must be a function',
+            __return: 'must return type',
             arguments: 'must have an object of parameter types specified in the class interface',
           },
           reference: {
-            default: 'Protected properties may not be accessed or set from outside of its parent class execution context',
+            __default: 'Protected properties may not be accessed or set from outside of its class execution context',
             arguments: 'You must provide an object of named arguments in',
           },
-          parameter: {
-
-          },
-          log: {
-            openError: 'Failed to open indexedDB',
-
-          }
+          // log: {
+          //   openError: 'Failed to open indexedDB',
+          // }
         }
 
-        // _Types__ - an array of all javascript types.
         const __Types__ = [
           'undefined',
           'boolean',
@@ -51,138 +38,118 @@ export const Protect = (BaseClass) => {
           'null'
         ]
 
-        // __ClassName__ - the base class name.
         const __ClassName__ = this.name
-
-        // __DateTime__ - today's date.
         const __DateTime__ = () => new Date().toString()
-
-        // _$Version__ - the version number. 
-        const _$Version__ = this._$Version__ || 1
-
-        // __DocumentTitle__ - document title.
+        const __Version__ = this.__Version__ || 1
         const __DocumentTitle__ = document.title
-
-        // __LastModified__ - the last modification date of this document.
         const __LastModified__ = document.lastModified
-
-        // Create the class id as a base64 hash.
-        const _$ClassID__ = this._$ClassID__ ||
+        const __ClassID__ = this.__ClassID__ ||
           btoa(`${
-            // Application or class version.
-            _$Version__
+            __Version__
             }:${
-            // Title of document.
             __DocumentTitle__
             }:${
-            // Name of base class.
             __ClassName__
             }`
-            // Replace all special characters with an underscore.
             .replace(/[^A-Z0-9]/ig, "_")
           )
-
-        // _$Debug__ - check and set debug mode.
-        const _$Debug__ = this._$Debug__ === true
-
-        // __IDBName__ - set the name of the indexeddb database.
+        const __Debug__ = this.__Debug__ === true
         const __IDBName__ = `Protect-${__DocumentTitle__}`
+        /* 
+          May add logging ability in the future.
+        */
+        // const __LogCheck__ = this.__Log__ === true
 
-        // __LogCheck__ - check and set log mode.
-        const __LogCheck__ = this._$Log__ === true
+        // if (__LogCheck__) {
 
-        // Setup logging if enabled.
-        if (__LogCheck__) {
+        //   let __Log__ = {
+        //     idb: __IDBName__,
+        //     Error: (error, event) => {
+        //       throw new Error(`${error} ${event}`)
+        //     }
+        //   }
 
-          // _$Log__ - an object to handle logging.
-          let _$Log__ = {
-            // Name of log in indexedDB.
-            idb: __IDBName__,
-            // Specifiy log error. 
-            Error: (error, event) => {
-              throw new Error(`${error} ${event}`)
-            }
-          }
+        //   __Log__.open = indexedDB
+        //     .open(
+        //       __Log__.idb,
+        //       __Version__,
+        //     )
 
-          // _$Log__.open - open a connection to indexDB and create a log for this class.
-          _$Log__.open = indexedDB
-            .open(
-              _$Log__.idb,
-              _$Version__,
-            )
 
-          // _$Log__.close - closes a connection to indexDB.
-          _$Log__.close =
+        //   __Log__.open.onupgradeneeded = event => {
 
-            // _$Log__.open.onerror - upgrade handler.
-            _$Log__.open.onupgradeneeded = event => {
+        //     __Log__.db = target.result
+        //     __Log__.store = __Log__
+        //       .db
+        //       .createObjectStore(
+        //         `Log-Store-${__ClassID__}`,
+        //         { keyPath: 'logid' }
+        //       )
+        //   }
 
-              _$Log__.db = target.result
-              _$Log__.store = _$Log__
-                .db
-                .createObjectStore(
-                  `Log-Store-${_$ClassID__}`,
-                  { keyPath: 'logid' }
-                )
-            }
+        //   __Log__.open.onerror = event => {
 
-          // _$Log__.open.onerror - error handle.
-          _$Log__.open.onerror = event => {
+        //     __Log__.Error(
+        //       __ErrorMessages__
+        //         .log
+        //         .openError,
+        //       event
+        //     )
+        //   }
 
-            _$Log__.Error(__ErrorMessages__.log.openError, event)
-          }
+        //   __Log__.open.onsuccess = ({ target }) => {
 
-          // $Log__.open.onsuccess - success handler. 
-          _$Log__.open.onsuccess = ({ target }) => {
+        //     __Log__.db = target.result
+        //   }
+        // }
 
-            _$Log__.db = target.result
-          }
-        }
-
-        // __ReferenceError__ - a custom reference error.
         const __ReferenceError__ = (
-          property,
-          message = __ErrorMessages__.reference.default
+          __Property__,
+          message = __ErrorMessages__
+            .reference
+            .__default
         ) => {
 
-          throw new ReferenceError(`${message}: ${property}`)
+          throw new ReferenceError(`${message}: ${__Property__}`)
         }
 
-        // __TypeError__ a custom type error.
         const __TypeError__ = (
-          property,
+          __Property__,
           type,
-          message = __ErrorMessages__.type.default
+          message = __ErrorMessages__
+            .type
+            .__default
         ) => {
 
           throw new TypeError(`${
-            // typeof property === 'string' - print if property is a string and if it is not print it's name.
-            typeof property === 'string' ?
-              property :
-              property.name
+            typeof __Property__ === 'string' ?
+              __Property__ :
+              __Property__.name
             } ${message}: ${
-            // typeof type === 'string' - print if type is a string and if it is not print it's type.
             typeof type === 'string' ?
               type :
               typeof type
             }`)
         }
 
-        // __ParameterCheck__ - a way to check types and parameters.
         const __ParameterCheck__ = (name, parameter, type) => {
 
-          //  !__Types__.includes(type) - check if type is a valid type included in the __Types__ array.
           if (!__Types__.includes(type))
 
-            // Throw type error
-            __TypeError__(name, type, __ErrorMessages__.type.parameter)
+            __TypeError__(
+              name,
+              type,
+              __ErrorMessages__
+                .type
+                .parameter
+            )
 
-          // type === '*' || type === 'any' - ignore check the type.
           if (type === '*' || type === 'any')
             return true
 
           if (
             typeof parameter === 'undefined' ||
+            typeof parameter !== 'function' &&
             parameter.length === 0
           ) return false
 
@@ -196,17 +163,15 @@ export const Protect = (BaseClass) => {
           return false
         }
 
-        const __ProtectCheck__ = (property) => {
+        const __ProtectCheck__ = (__Property__) => {
 
-          if (
-            property.indexOf('_$') === 0 ||
-            property.indexOf('__') === 0
-          ) return true
+          if (__Property__.indexOf('__') === 0)
+            return true
 
           return false
         }
 
-        let __Protect__ = {
+        const __Protect__ = {
           Methods: [],
           Properties: []
         }
@@ -214,103 +179,220 @@ export const Protect = (BaseClass) => {
         Object
           .getOwnPropertyNames(this)
           .filter(
-            property => {
+            __Property__ => {
 
-              if (__ProtectCheck__(property)) {
-
-                if (__ParameterCheck__(property, this[property], 'function'))
-                  __Protect__.Methods.push(property)
-
-                __Protect__.Properties.push(property)
-              }
+              if (__ProtectCheck__(__Property__))
+                __Protect__.Properties.push(__Property__)
 
               return
             }
           )
+        Object
+          .getOwnPropertyNames(BaseClass.prototype)
+          .filter(
+            __Property__ => {
+
+              if (__ProtectCheck__(__Property__))
+                __Protect__.Methods.push(__Property__)
+              return
+            }
+          )
+
 
         const __Protected__ = Object.freeze(__Protect__)
 
         const __Handler__ = this.__Handler__ || {
 
-          get: (target, property) => {
+          get: (__Target__, __Property__) => {
 
             if (
-              __Protected__.Properties.includes(property) &&
+              __Protected__
+                .Properties
+                .includes(__Property__) &&
               !__ProtectedAccess__
             )
-              __ReferenceError__(property)
+              __ReferenceError__(__Property__)
 
             if (
-              __Protected__.Methods.includes(property) &&
+              __Protected__
+                .Methods
+                .includes(__Property__) &&
               !__ProtectedAccess__
             )
-              __ReferenceError__(property)
+              __ReferenceError__(__Property__)
 
             if (
               __ParameterCheck__(
-                property,
-                this[property],
+                __Property__,
+                this[__Property__],
                 'function'
               )
             ) {
 
-              __ProtectedAccess__ = true
+              if (__ProtectCheck__(__Property__))
+                __ReferenceError__(
+                  __Property__,
+                  __ErrorMessages__
+                    .reference
+                    .__default)
 
-              const __Method__ = this[property]
+              const __Method__ = this[__Property__]
 
-              if (this._$Interface__ && Object.keys(this._$Interface__).length !== 0) {
+              let __ArgTypes__ = false
 
-                const __ArgTypes__ = this._$Interface__[property]
+              let __BeforeEffectCheck__ = false,
+                __AfterEffectCheck__ = false,
+                __ReturnTypeCheck__ = false,
+                __BeforeEffect__,
+                __AfterEffect__
 
-                let _$
-
-                if (__ArgTypes__._$before && !__ParameterCheck__('_$before', __ArgTypes__._$before, 'function')) {
-
-                  __TypeError__('_$before', __ArgTypes__._$before, __ErrorMessages__.type.effects)
-                } else {
-                
-                  _$.before = __ArgTypes__._$before || false
-                }
-
-                if (__ArgTypes__._$after && !__ParameterCheck__('_$after', __ArgTypes__._$after, 'function')) {
-                
-                  __TypeError__('_$after', __ArgTypes__._$after, __ErrorMessages__.type.effects)
-                } else {
-                
-                  _$.after = __ArgTypes__._$after || false
-                }
+              if (
+                !this.__Interface__ &&
+                !Object.keys(this.__Interface__)
+                  .length !== 0 &&
+                !this.__Interface__[__Property__]
+              )
+                __TypeError__(
+                  __Property__,
+                  'undefined',
+                  __ErrorMessages__
+                    .type
+                    .interface
+                )
 
 
-              } else {
-                __TypeError__(property, 'undefined', __ErrorMessages__.type.interface)
+              __ArgTypes__ = this.__Interface__[__Property__]
+
+              if (
+                !__ParameterCheck__(
+                  __Property__,
+                  __ArgTypes__,
+                  'object'
+                )
+              )
+                __TypeError__(
+                  __Property__,
+                  'undefined',
+                  __ErrorMessages__
+                    .type
+                    .interface
+                )
+
+              if (__ArgTypes__.__before) {
+
+
+                if (
+                  !__ParameterCheck__(
+                    '__before',
+                    __ArgTypes__
+                      .__before,
+                    'function'
+                  )
+                )
+                  __TypeError__(
+                    '__before',
+                    __ArgTypes__
+                      .__before,
+                    __ErrorMessages__
+                      .type
+                      .effects
+                  )
+
+                __BeforeEffect__ = __ArgTypes__
+                  .__before
+                __BeforeEffectCheck__ = true
               }
 
-              if (!__ArgTypes__)
-                __TypeError__(property, 'undefined', __ErrorMessages__.type.arguments)
+              if (
+                __ArgTypes__
+                  .__return
+              ) {
+                if (
+                  !__ParameterCheck__(
+                    '__return',
+                    __ArgTypes__
+                      .__return,
+                    'string'
+                  ) &&
+                  !__Types__
+                    .includes(
+                      __ArgTypes__
+                        .__return
+                    )
+                )
+                  __TypeError__(
+                    '__return',
+                    __ArgTypes__
+                      .__return,
+                    __ErrorMessages__
+                      .type
+                      .__return
+                  )
+              }
+
+              if (__ArgTypes__.__after) {
+                if (
+                  !__ParameterCheck__(
+                    '__after',
+                    __ArgTypes__
+                      .__after,
+                    'function'
+                  )
+                )
+                  __TypeError__(
+                    '__after',
+                    __ArgTypes__
+                      .__after,
+                    __ErrorMessages__
+                      .type
+                      .effects
+                  )
+              }
 
               return (...args) => {
 
+                __ProtectedAccess__ = true
+
                 if (args.length === 0)
                   __ReferenceError__(
-                    property,
-                    __ErrorMessages__.reference.arguments
+                    __Property__,
+                    __ErrorMessages__
+                      .reference
+                      .arguments
                   )
 
-                const __ArgumentCallBack__ = _$.after || false
 
-                Object.keys(args[0]).map(arg => {
+                if (__ArgTypes__)
+                  Object
+                    .keys(args[0])
+                    .map(
+                      __Arg__ => {
 
-                  if (!__ParameterCheck__(arg, args[0][arg], __ArgTypes__[arg]))
-                    __TypeError__(arg, __ArgTypes__[arg], __ErrorMessages__.type.parameter)
-                })
+                        if (
+                          !__ParameterCheck__(
+                            __Arg__,
+                            args[0][__Arg__],
+                            __ArgTypes__[__Arg__]
+                          )
+                        )
+
+                          __TypeError__(
+                            __Arg__,
+                            __ArgTypes__[__Arg__],
+                            __ErrorMessages__
+                              .type
+                              .parameter
+                          )
+                      }
+                    )
 
                 let __ApplyArgs__ = [...args]
 
-                if (_$.before) {
-                  const __$BeforeResults__ = {
-                    _$: _$.before(...args)
-                  }
-                  __ApplyArgs__ = [...args, __$BeforeResults__]
+                if (__BeforeEffectCheck__) {
+
+                  const __BeforeResults__ = __BeforeEffect__(...args)
+
+                  __ApplyArgs__ = [...args, __BeforeResults__]
                 }
 
                 let __Results__ = __Method__
@@ -320,22 +402,20 @@ export const Protect = (BaseClass) => {
                   )
 
                 if (
-                  __ArgumentCallBack__ &&
-                  __ArgTypes__._$return &&
                   !__ParameterCheck__(
-                    '_$return',
-                    __ArgumentCallBack__(__Results__),
-                    __ArgTypes__._$return
+                    __Property__,
+                    __Results__,
+                    __ArgTypes__.__return
                   )
                 )
                   __TypeError__(
-                    property,
-                    __ArgTypes__._$return,
-                    __ErrorMessages__.type.effects
+                    __Property__,
+                    __ArgTypes__.__return,
+                    __ErrorMessages__.type.__return
                   )
 
-                if (__ArgumentCallBack__)
-                  __Results__ = __ArgumentCallBack__(__Results__)
+                if (__AfterEffectCheck__)
+                  __Results__ = __AfterEffect__(__Results__)
 
                 __ProtectedAccess__ = false
 
@@ -344,20 +424,45 @@ export const Protect = (BaseClass) => {
               }
             }
 
-            return this[property]
+            return this[__Property__]
           },
 
-          set: (target, property, value) => {
+          set: (__Target__, __Property__, __Value__) => {
 
-            if (__ProtectCheck__(property)) __ReferenceError__(property)
+            if (
+              __ParameterCheck__(
+                __Property__,
+                this[__Property__],
+                'function'
+              ) ||
+              __ProtectCheck__(__Property__)
+            )
+              __ReferenceError__(
+                __Property__,
+                __ErrorMessages__
+                  .reference
+                  .__default
+              )
 
-            return this[property] = value
+            return this[__Property__] = __Value__
           }
         }
 
-        if (_$Debug__) console.info('__Protected__', __Protected__)
+        if (__Debug__)
+          console.info('__Protected__', __Protected__)
 
-        return Object.freeze(Object.seal(Object.preventExtensions(new Proxy(this, __Handler__))))
+        const __ProtectedClass__ = new Proxy(this, __Handler__)
+
+        return Object
+          .freeze(
+            Object.seal(
+              __Extend__ ?
+                __ProtectedClass__ :
+                Object.preventExtensions(
+                  __ProtectedClass__
+                )
+            )
+          )
       }
     }
   return new TypeError(`You must provide a class: ${BaseClass.name || 'undefined'}`)
